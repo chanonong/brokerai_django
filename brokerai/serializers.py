@@ -19,10 +19,31 @@ class PredictedDataSerializer(serializers.HyperlinkedModelSerializer):
 		model = Predicted_data
 		fields = ('id', 'stock_id', 'nn_daily', 'nn_weekly', 'nn_monthly', 'dt_daily', 'dt_weekly', 'dt_monthly', 'bs_daily', 'bs_weekly', 'bs_monthly')
 
-class UsersSerializer(serializers.HyperlinkedModelSerializer):
+class UsersSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Users
 		fields = ('id', 'first_name', 'surname', 'username', 'password', 'email')
+		extra_kwargs = {'password' : {'write_only':True}}
+
+	def update(self, instance, validated_data):
+	    instance.first_name = validated_data.get('first_name', instance.first_name)
+	    instance.surname = validated_data.get('surname', instance.surname)
+	    instance.username = validated_data.get('username', instance.username)
+	    instance.password = validated_data.get('password', instance.password)
+	    instance.email = validated_data.get('email', instance.email)
+	    instance.style = validated_data.get('style', instance.style)
+	    instance.save()
+	    return instance
+
+	def create(self, validated_data):
+	    return Users.objects.create(**validated_data)
+
+class UserSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = User
+		fields = ('id', 'first_name', 'last_name', 'username', 'password', 'email')
+		extra_kwargs = {'password' : {'write_only':True}}
+			
 
 class UserFavoriteSerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:

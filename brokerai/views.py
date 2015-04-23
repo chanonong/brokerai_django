@@ -9,6 +9,7 @@ from brokerai.models import *
 from brokerai.serializers import *
 import json
 from datetime import datetime
+from rest_framework import generics, permissions
 
 class JSONResponse(HttpResponse):
     """
@@ -67,6 +68,7 @@ def forLearn(request):
             flat_row = [item for sublist in row for item in sublist]
             real_output = str(_[1][0].close_price)
             flat_row += [real_output]
+            flat_row += [_[0][0].company_id.symbol]
             content += [','.join(flat_row)]
         #     print(content)
         #print(','.join([str(d.open_price) for d in _]))
@@ -77,6 +79,41 @@ def forLearn(request):
     html_output = '<br>'.join(header + content)
     response = HttpResponse(output, content_type='application/text')
     response['Content-Disposition'] = 'attachment; filename="test.arff"'
+    return response
+
+def latest(request):
+    companies = Companies.objects.all()#[:100]
+    #date_range = ["2014-06-01","2014-07-01"]
+    no_of_set = request.GET.get('set_count') or 7
+    no_of_set = int(no_of_set)
+    header = ["@relation latest",""]
+    for i in range(no_of_set):
+        header += ["@attribute high"+ str(i+1) +" numeric"]
+        header += ["@attribute low"+ str(i+1) +" numeric"]
+        header += ["@attribute open"+ str(i+1) +" numeric"]
+        header += ["@attribute volume"+ str(i+1) +" numeric"]
+    header += ["@attribute output numeric","","@data"]
+
+    content = []
+    stl = []
+    for c in companies:
+        s = Stock_data.objects.filter(company_id=c.id).order_by('date')[::-1][:no_of_set]
+        stl += [s]
+    for _ in stl:
+        if len(_) != 0:
+            row = [[str(d.high_price),str(d.low_price),str(d.close_price),str(d.volume)] for d in _]
+            flat_row = [item for sublist in row for item in sublist]
+            flat_row += [_[0].company_id.symbol]
+            content += [','.join(flat_row)]
+        #     print(content)
+        #print(','.join([str(d.open_price) for d in _]))
+    #print(companiesList)
+    # for s in stock:
+    #     print(list(map(str,[s.high_price,s.low_price,s.close_price,s.volume])))
+    output = '\n'.join(header + content)
+    html_output = '<br>'.join(header + content)
+    response = HttpResponse(output, content_type='application/text')
+    response['Content-Disposition'] = 'attachment; filename="latest.arff"'
     return response
 
 # Create your views here.
@@ -104,6 +141,7 @@ def companies_list(request):
             serializer.save()
             return JSONResponse(serializer.data, status=201)
         return JSONResponse(serializer.errors, status=400)
+
 
 @csrf_exempt
 @api_view(['GET','POST'])
@@ -144,24 +182,47 @@ def predicted_data(request):
         return JSONResponse(serializer.errors, status=400)
 
 @csrf_exempt
+@api_view(['POST'])
+def register(request):
+    VALID_USER_FIELDS = [f.name for f in User._meta.fields]
+    DEFAULTS = {
+        # you can define any defaults that you would like for the user, here
+    }
+    serialized = UserSerializer(data=request.DATA)
+    if serialized.is_valid():
+        user_data = {field: data for (field, data) in request.DATA.items() if field in VALID_USER_FIELDS}
+        user_data.update(DEFAULTS)
+        user = User.objects.create_user(
+            **user_data
+        )
+        return HttpResponse(UserSerializer(instance=user).data, status=201)#status.HTTP_201_CREATED)
+    else:
+        return HttpResponse(serialized._errors, status=400)#status.HTTP_400_BAD_REQUEST)
+
+@csrf_exempt
 @api_view(['GET','POST'])
 def users(request):
-    """
-    List all companies, or create a new companies
-    """
     if request.method == 'GET':
-        users = Users.objects.all()
-        serializer = UsersSerializer(users, many=True)
+        user = User.objects.all()
+        serializer = UserSerializer(user, many=True)
         return JSONResponse(serializer.data)
 
     elif request.method == 'POST':
         data = JSONParser().parse(request)
-        serializer = UsersSerializer(data=data)
+        serializer = UserSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return JSONResponse(serializer.data, status=201)
         return JSONResponse(serializer.errors, status=400)
 
+# class UserListCreateAPIView(generics.ListCreateAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
+
+#     def get_permissions(self):
+#         if self.request.method in permissions.SAFE_METHODS:
+#             return (permissions.IsAuthenticated(),)
+#         return (permissions.AllowAny(),)
 
 @csrf_exempt
 @api_view(['GET','POST'])
