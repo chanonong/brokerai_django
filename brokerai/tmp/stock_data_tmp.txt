@@ -1,3 +1,0 @@
-{'volume': 43197268, 'currency': 'USD', 'symbol': 'AAL', 'date': '2013-12-09T00:00:00', 'open': 23.95, 'low': 23.45, 'high': 25.44, 'close': 24.6}
-{'volume': 18660625, 'currency': 'USD', 'symbol': 'AAL', 'date': '2013-12-10T00:00:00', 'open': 24.54, 'low': 24.41, 'high': 25.17, 'close': 24.88}
-{'volume': 38843371, 'currency': 'USD', 'symbol': 'AAL', 'date': '2013-12-11T00:00:00', 'open': 25.44, 'low': 25.37, 'high': 27.2, 'close': 25.99}
