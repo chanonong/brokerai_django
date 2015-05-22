@@ -11,11 +11,17 @@ from time import sleep
 import json
 from operator import itemgetter
 import sys
+import os
 
 NUMBER_OF_DAYS = 10
 HOST = 'http://dev.markitondemand.com'
 PATH = '/Api/v2/InteractiveChart/json?parameters='
-TMP_FOLDER_PATH = '/Users/chanon/Documents/brokerai_django/brokerai/tmp/'
+TMP_FOLDER_PATH = os.path.split(__file__)[0] + '/tmp/'
+print(TMP_FOLDER_PATH)
+def cleanlog():
+	with open(TMP_FOLDER_PATH + 'log.txt','w') as log:
+		log.write('')
+
 def log(data):
 	with open(TMP_FOLDER_PATH + 'log.txt','a') as log:
 		log.write(data)
@@ -82,7 +88,8 @@ def cronStock():
 	# with open(TMP_FOLDER_PATH + 'a.txt','a') as g:
 	# 	res = Stock_data.objects.values('company_id').annotate(max_date=Max('date'))
 
-
+cleanlog()
 	
 
 	
+

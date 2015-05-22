@@ -86,9 +86,7 @@ MIDDLEWARE_CLASSES = (
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
 )
-
 CORS_ORIGIN_ALLOW_ALL = True
-
 ROOT_URLCONF = 'brokerai_django.urls'
 
 TEMPLATES = [
@@ -115,18 +113,20 @@ WSGI_APPLICATION = 'brokerai_django.wsgi.application'
 
 DATABASES = {
     # 'default': {
-    #    'ENGINE': 'django.db.backends.sqlite3',
-    #    'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     # }
     'default': {
-       'ENGINE': 'django.db.backends.mysql',
-       'NAME': 'brokerai',
-       'USER': 'brokerai',
-       'PASSWORD': 'mysql@brokerai',
-       'HOST': '127.0.0.1',
-       'PORT': '3306'
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'brokerai',
+        'USER': 'brokerai',
+        'PASSWORD': 'mysql@brokerai',
+        'HOST': '128.199.105.21',
+        'PORT': '3306'
     },
-
+    'salve': {
+    
+    }
 }
 
 
@@ -148,3 +148,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+
