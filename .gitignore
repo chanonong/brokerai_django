@@ -1,3 +1,4 @@
+brokerai/tmp/
 *.sqlite3
 datadump.json
 brokerai/tmp/log.txt
